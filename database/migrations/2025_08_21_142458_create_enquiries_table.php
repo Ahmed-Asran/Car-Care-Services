@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('enquiries', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('user_id')->index('user_id');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->text('content')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });

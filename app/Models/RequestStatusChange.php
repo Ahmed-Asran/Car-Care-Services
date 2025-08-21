@@ -10,5 +10,13 @@ class RequestStatusChange extends Model
         'request_id',
         'status'
     ];
+
+    use HasFactory;
+
+    public function request()
+    {
+        return $this->belongsTo(Request::class);
+    }
+
 }
 

@@ -4,19 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class notification extends Model
+class Review extends Model
 {
-        protected $fillable = [
-        'request_id',
-        'content',
-    ];
-
     use HasFactory;
+
+    protected $fillable = ['request_id', 'rating', 'comment'];
 
     public function request()
     {
         return $this->belongsTo(Request::class);
     }
-
-
 }

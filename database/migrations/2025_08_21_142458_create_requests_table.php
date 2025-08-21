@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('customer_car_id')->index('idx_requests_customer');
-            $table->integer('provider_id')->nullable()->index('idx_requests_provider');
-            $table->integer('service_id')->index('service_id');
+            $table->foreignId('customer_car_id')->constrained('customer_cars')->onDelete('cascade');
+            $table->foreignId('provider_id')->nullable()->constrained('providers')->nullOnDelete();
+            $table->foreignId('service_id')->nullable()->constrained('services')->nullOnDelete();
             $table->decimal('location_latitude', 10, 8)->nullable();
             $table->decimal('location_longitude', 11, 8)->nullable();
             $table->decimal('distance', 10)->nullable();

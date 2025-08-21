@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('enquiry_responses', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('enquiry_id')->index('enquiry_id');
+            $table->foreignId('enquiry_id')->constrained('enquiries')->onDelete('cascade');
             $table->boolean('is_admin')->nullable()->default(false);
             $table->text('content')->nullable();
             $table->timestamp('created_at')->useCurrent();
