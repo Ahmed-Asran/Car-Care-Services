@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Images</title>
+</head>
+<body>
+  <h1>رفع الصور</h1>
+
+  <form id="uploadForm">
+    <input type="file" name="file" id="fileInput" required>
+    <button type="submit">رفع الصورة</button>
+  </form>
+
+  <h2>الصور المرفوعة</h2>
+  <div id="imagesList"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const imagesList = document.getElementById('imagesList');
+
+    // رفع الصورة
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      const res = await fetch('http://localhost:8000/api/images', {
+        method: 'POST',
+        body: formData
+      });
+
+      if(res.ok){
+        alert('تم رفع الصورة بنجاح!');
+        fileInput.value = '';
+        loadImages();
+      } else {
+        alert('فشل رفع الصورة');
+      }
+    });
+
+    // عرض الصور
+    async function loadImages() {
+      imagesList.innerHTML = '';
+      const res = await fetch('http://localhost:8000/api/images');
+      const images = await res.json();
+
+      images.forEach(img => {
+        const imgElem = document.createElement('img');
+        imgElem.src = `http://localhost:8000/storage/${img.path}`;
+        imgElem.width = 200;
+        imgElem.style.margin = '10px';
+        imagesList.appendChild(imgElem);
+      });
+    }
+
+    // تحميل الصور عند فتح الصفحة
+    loadImages();
+  </script>
+</body>
+</html>
