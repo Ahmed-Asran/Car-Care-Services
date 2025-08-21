@@ -48,8 +48,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     // retrive or filter users by role
     public function getUsersOfRule($query,$role){
         return $query->where('role',$role);
     }
+
+
+    public function provider() {
+    return $this->hasOne(Provider::class);
+}
+
 }
