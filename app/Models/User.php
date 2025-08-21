@@ -18,8 +18,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
+        'phone',
         'password',
     ];
 
@@ -31,6 +33,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'salt'
     ];
 
     /**
@@ -46,7 +49,14 @@ class User extends Authenticatable
         ];
     }
 
+    // retrive or filter users by role
+    public function getUsersOfRule($query,$role){
+        return $query->where('role',$role);
+    }
+
+
     public function provider() {
     return $this->hasOne(Provider::class);
 }
+
 }
