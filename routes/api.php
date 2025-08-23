@@ -28,7 +28,9 @@ use App\Http\Controllers\CarTypeController;
 
 Route::apiResource('car-types', CarTypeController::class);
 
-
+//Registeration 
+Route::post('/register/customer', [AuthController::class, 'customerRegister']);
+Route::post('/register/provider', [AuthController::class, 'providerRegister']);
 
 
 
