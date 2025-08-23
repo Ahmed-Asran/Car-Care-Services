@@ -60,5 +60,13 @@ class User extends Authenticatable
     public function provider() {
     return $this->hasOne(Provider::class);
 }
+    public function cars()
+    {
+        return $this->hasMany(CustomerCar::class, 'customer_id');
+    }
 
+    public function enquiries()
+    {
+        return $this->hasMany(Enquiry::class);
+    }
 }

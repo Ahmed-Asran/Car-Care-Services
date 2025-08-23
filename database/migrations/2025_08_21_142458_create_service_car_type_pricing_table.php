@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('service_car_type_pricing', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('service_id');
-            $table->integer('car_type_id')->index('car_type_id');
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
+            $table->foreignId('car_type_id')->constrained('car_types')->onDelete('cascade');
             $table->decimal('price', 10);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();

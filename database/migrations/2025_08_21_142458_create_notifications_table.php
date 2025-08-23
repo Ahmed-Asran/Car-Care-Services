@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('request_id')->index('request_id');
+            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
             $table->text('content')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });

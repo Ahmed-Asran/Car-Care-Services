@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('providers', function (Blueprint $table) {
-            $table->integer('user_id')->primary();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending')->index('idx_providers_status');
             $table->integer('national_id_image_id')->nullable()->index('national_id_image_id');
-            $table->integer('location_id')->nullable()->index('location_id');
+            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();
         });

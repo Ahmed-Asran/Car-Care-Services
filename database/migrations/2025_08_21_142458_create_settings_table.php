@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->integer('id', true);
             $table->string('name');
-            $table->integer('logo_id')->nullable()->index('logo_id');
-            $table->integer('about_image_id')->nullable()->index('about_image_id');
+            $table->foreignId('logo_id')->nullable()->constrained('images')->nullOnDelete();
+            $table->foreignId('about_image_id')->nullable()->constrained('images')->nullOnDelete();
             $table->text('about_description')->nullable();
             $table->decimal('price_per_km', 10)->nullable()->default(0);
             $table->text('terms_and_conditions')->nullable();

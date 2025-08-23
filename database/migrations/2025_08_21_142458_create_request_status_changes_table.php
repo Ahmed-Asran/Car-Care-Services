@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('request_status_changes', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('request_id')->index('request_id');
+            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted', 'in_progress', 'completed', 'cancelled']);
             $table->timestamp('created_at')->useCurrent();
         });

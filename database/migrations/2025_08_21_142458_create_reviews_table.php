@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('request_id')->unique('unique_request_review');
-            $table->integer('rating')->nullable();
+            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');            $table->integer('rating')->nullable();
             $table->text('comment')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();

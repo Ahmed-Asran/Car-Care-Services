@@ -12,12 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('images', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->string('name')->nullable();
-            $table->string('mime', 100)->nullable();
-            $table->string('path', 500)->nullable();
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();
+            $table->id();
+            $table->timestamps();
         });
     }
 
