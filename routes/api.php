@@ -27,33 +27,15 @@ Route::delete('customer-cars/{id}', [CustomerCarController::class, 'destroy']);
 use App\Http\Controllers\CarTypeController;
 
 Route::apiResource('car-types', CarTypeController::class);
-
-//Registeration 
-Route::post('/register/customer', [AuthController::class, 'customerRegister']);
-Route::post('/register/provider', [AuthController::class, 'providerRegister']);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-Route::post('register',[AuthController::class,'register']);
 
+//registration 
+Route::post('register',[AuthController::class,'Register']);
+//login
 Route::post('login',[AuthController::class,'login']);
-
+//logout
 Route::post('logout',[AuthController::class,'logout'])
 ->middleware('auth:sanctum');
 
