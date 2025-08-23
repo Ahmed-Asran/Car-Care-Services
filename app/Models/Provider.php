@@ -27,4 +27,5 @@ class Provider extends Model
     {
     return $this->belongsTo(Location::class);
 
+    }
 }
