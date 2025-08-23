@@ -21,9 +21,10 @@ class Provider extends Model
     {
         return $this->hasMany(Request::class);
     }
+
     
     public function location()
     {
     return $this->belongsTo(Location::class);
-    }
+
 }
