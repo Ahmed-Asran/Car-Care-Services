@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImageController;
@@ -26,24 +27,15 @@ Route::delete('customer-cars/{id}', [CustomerCarController::class, 'destroy']);
 use App\Http\Controllers\CarTypeController;
 
 Route::apiResource('car-types', CarTypeController::class);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+//registration 
+Route::post('register',[AuthController::class,'Register']);
+//login
+Route::post('login',[AuthController::class,'login']);
+//logout
+Route::post('logout',[AuthController::class,'logout'])
+->middleware('auth:sanctum');
+
