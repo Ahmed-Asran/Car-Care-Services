@@ -18,4 +18,17 @@ class Setting extends Model
         'phone_number',
         'second_phone_number',
     ];
+
+    use HasFactory;
+
+    public function logo()
+    {
+        return $this->belongsTo(Image::class, 'logo_id');
+    }
+
+    public function aboutImage()
+    {
+        return $this->belongsTo(Image::class, 'about_image_id');
+    }
+
 }

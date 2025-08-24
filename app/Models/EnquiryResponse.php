@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class EnquiryResponse extends Model
 {
+
+    use HasFactory;
     protected $fillable = [
         'Enquiry_id','is_admin','Content'
     ];
+
+    public function enquiry()
+    {
+        return $this->belongsTo(Enquiry::class);
+    }
+
 }

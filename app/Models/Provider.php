@@ -21,10 +21,12 @@ class Provider extends Model
     {
         return $this->hasMany(Request::class);
     }
+
     
     public function location()
     {
     return $this->belongsTo(Location::class);
+
     }
     public function nationalIdImage(){
         return $this->belongsTo(Image::class,'national_id_image_id');
