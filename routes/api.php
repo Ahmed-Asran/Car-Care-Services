@@ -31,11 +31,16 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+//-----------------------public routes--------------
 //registration 
-Route::post('register',[AuthController::class,'Register']);
+Route::post('register',[AuthController::class,'register']);
 //login
 Route::post('login',[AuthController::class,'login']);
+//-----------------------protected routes-----------
+Route::middleware('auth:sanctum')->group(function(){
+//request to be provider
+Route::post('register/provider',[AuthController::class,'registerProvider']);
 //logout
-Route::post('logout',[AuthController::class,'logout'])
-->middleware('auth:sanctum');
+Route::post('logout',[AuthController::class,'logout']);
+});
 

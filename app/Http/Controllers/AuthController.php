@@ -13,72 +13,85 @@ use Mockery\Expectation;
 
 class AuthController extends Controller
 {
-    public function Register(Request $request){
-        // If role is sent as empty string, normalize it to null
-    if ($request->has('role') && $request->role === '') {
-        $request->merge(['role' => null]);
-    }
-            $fields=$request->validate([// user details 
-                'first_name' => 'required|string|max:255',
-                'last_name'  => 'required|string|max:255',
-                'email'      => 'required|string|email|unique:users',
-                'phone'      => 'required|string|max:20|unique:users',
-                'password'   => 'required|string|confirmed|min:6',
-                'role' => 'nullable|in:customer,provider',
-                
-            // provider details, image not execluded 
-            'street'    => 'nullable|string|max:255',
-            'city'      => 'required_if:role,provider|string|max:100',
-            'state'     => 'required_if:role,provider|string|max:100',
-            'country'   => 'required_if:role,provider|string|max:100',
-            'latitude'  => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            ]);
-           
-            // Default role to customer if not provided
-            $role = $request->input('role', 'customer'); 
-            
-            DB::beginTransaction(); //begin the creation of all field in the entities
-        try {
-            // Default role to customer if it is empty
-            if (empty($request['role'])) 
-                {
-                $request['role'] = 'customer';
-                $role='customer';
-                }
-            $user =User::create([
+    public function register( Request $request){
+        $fields=$request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|string|email|unique:users',
+            'phone'      => 'required|string|max:20|unique:users',
+            'password'   => 'required|string|confirmed|min:6',
+        ]);
+        $user=User::create([
             'first_name' => $fields['first_name'],
             'last_name'  => $fields['last_name'],
             'email'      => $fields['email'],
             'phone'      => $fields['phone'],
             'password'   => Hash::make($fields['password']),
-            'salt'        => bin2hex(random_bytes(16)),
-            'role'       => $role
-            ]);
-            if($role=="provider")
+            'salt'        => bin2hex(random_bytes(16))
+        ]);
+        $token=$user->createToken($user->last_name);
+        $response=Response(["user"=>$user,"token"=>$token],201);
+        return Response()->json($response,201);
+    }
+    public function registerProvider(Request $request){
+        // check the user is exist first 
+        $user=$request->user();
+        if(!$user)
+        {
+        return Response()->json(['error' => 'User not authenticated'],401);
+        }
+
+        $fields=$request->validate([   
+        // provider details, image  execluded 
+        'street'    => 'nullable|string|max:255',
+        'city'      => 'required|string|max:100',
+        'state'     => 'required|string|max:100',
+        'country'   => 'required|string|max:100',
+        'latitude'  => 'nullable|numeric|between:-90,90',
+        'longitude' => 'nullable|numeric|between:-180,180',
+        'national_id_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+           
+            
+        DB::beginTransaction(); //begin the creation of all field in the entities
+        try {
+            if ($user->role !== 'provider') {
+            $user->role = 'provider';
+            $user->save();
+            }
+            $image=null;
+            if($request->hasFile('national_id_image'))
             {
-                $location =\App\Models\Location::create([
-                'street'    => $fields['street'] ?? null,
-                'city'      => $fields['city'] ?? null,
-                'state'     => $fields['state'] ?? null,
-                'country'   => $fields['country']??null,
-                'latitude'  => $fields['latitude'] ?? null,
-                'longitude' => $fields['longitude'] ?? null,
-                ]);
-                $provider = \App\Models\Provider::create([
-                'user_id' => $user->id,
-                'verification_status' => 'pending',
-                'location_id' => $location->id,
-                
-                ]);
+            $file=$request->file('national_id_image');
+            $path=$file->store('images', 'public');
+            
+            $image = \App\Models\Image::create([
+            'name' => $file->getClientOriginalName(),
+            'mime' => $file->getClientMimeType(),
+            'path' => $path,
+
+            ]);
             }
-            $token = $user->createToken("{$role}_token")->plainTextToken;
+            $location =\App\Models\Location::create([
+            'street'    => $fields['street'] ?? null,
+            'city'      => $fields['city'] ?? null,
+            'state'     => $fields['state'] ?? null,
+            'country'   => $fields['country']??null,
+            'latitude'  => $fields['latitude'] ?? null,
+            'longitude' => $fields['longitude'] ?? null,
+            ]);
+            $provider = \App\Models\Provider::create([
+            'user_id' => $user->id,
+            'verification_status' => 'pending',
+            'location_id' => $location->id,
+            'national_id_image_id'=>$image->id
+            ]);
+            $token = $user->createToken('provider_token')->plainTextToken;
             DB::commit();
-            $response=['message' => "{$role} registered successfully",'user'=> $user,'token'   => $token,];
-            if ($request->role === 'provider') {
-                $response['provider'] = $provider;
-                $response['location'] = $location;
-            }
+            $response=['message' => "registered successfully as provider",'user'=> $user,'token'   => $token];
+            $response['provider'] = $provider;
+            $response['location'] = $location;
+            $response['image']=$image;
             return response()->json($response,201);
             }catch (\Exception $e) {
                 DB::rollBack();

@@ -10,4 +10,7 @@ class Image extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'mime', 'path'];
+    public function provider(){
+        return $this->hasOne(provider::class,'national_id_image_id');
+    } 
 }
