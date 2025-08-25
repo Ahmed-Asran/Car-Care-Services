@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('providers', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending')->index('idx_providers_status');
             $table->foreignId('national_id_image_id')->nullable()->constrained('images')->nullOnDelete();

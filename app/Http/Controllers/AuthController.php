@@ -84,7 +84,7 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'verification_status' => 'pending',
             'location_id' => $location->id,
-            'national_id_image_id'=>$image->id
+            'national_id_image_id'=>$image->id??null,
             ]);
             $token = $user->createToken('provider_token')->plainTextToken;
             DB::commit();
