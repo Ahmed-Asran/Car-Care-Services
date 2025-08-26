@@ -19,6 +19,7 @@ Route::post('enquiry-responses', [EnquiryResponseController::class, 'store']);
 
 //======================================================
 use App\Http\Controllers\CarTypeController;
+use App\Http\Controllers\ServiceController;
 use App\Models\User;
 
 Route::apiResource('car-types', CarTypeController::class);
@@ -53,5 +54,7 @@ Route::get('customer-cars/{id}', [CustomerCarController::class, 'show']);
 Route::put('customer-cars/{id}', [CustomerCarController::class, 'update']);
 Route::delete('customer-cars/{id}', [CustomerCarController::class, 'destroy']);
 Route::get('customer-cars', [CustomerCarController::class, 'index']);
+//Route::post('service-create',[ServiceController::class,'store']);
+ Route::apiResource('services', ServiceController::class);
 });
 
