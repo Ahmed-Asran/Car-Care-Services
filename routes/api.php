@@ -17,14 +17,7 @@ Route::post('enquiries', [EnquiryController::class, 'store']);     // POST إض�
 
 Route::post('enquiry-responses', [EnquiryResponseController::class, 'store']);
 
-
-Route::get('customer-cars', [CustomerCarController::class, 'index']);
-Route::get('customer-cars/{id}', [CustomerCarController::class, 'show']);
-Route::post('customer-cars', [CustomerCarController::class, 'store']);
-Route::put('customer-cars/{id}', [CustomerCarController::class, 'update']);
-Route::delete('customer-cars/{id}', [CustomerCarController::class, 'destroy']);
-
-
+//======================================================
 use App\Http\Controllers\CarTypeController;
 use App\Models\User;
 
@@ -55,5 +48,10 @@ Route::get('/users/{user}', [UserController::class, 'show'])
 Route::post('/users/{user}', [UserController::class, 'update'])
     ->name('users.update');
 //Route::post('/reset-password', [AuthController::class, 'reset']);
+Route::post('customer-cars', [CustomerCarController::class, 'store']);
+Route::get('customer-cars/{id}', [CustomerCarController::class, 'show']);
+Route::put('customer-cars/{id}', [CustomerCarController::class, 'update']);
+Route::delete('customer-cars/{id}', [CustomerCarController::class, 'destroy']);
+Route::get('customer-cars', [CustomerCarController::class, 'index']);
 });
 
