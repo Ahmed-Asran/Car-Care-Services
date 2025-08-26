@@ -8,7 +8,7 @@ class CarType extends Model
 {
  protected $fillable = ['manufacturer', 'model'];
 
-     use HasFactory;
+    // use HasFactory;
 
     public function cars()
     {

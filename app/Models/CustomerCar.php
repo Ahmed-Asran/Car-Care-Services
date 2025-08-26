@@ -12,7 +12,7 @@ class CustomerCar extends Model
         'car_license',
     ];
 
-    use HasFactory;
+    //use HasFactory;
 
     public function customer()
     {
