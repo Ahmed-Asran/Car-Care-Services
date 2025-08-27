@@ -21,6 +21,7 @@ Route::post('enquiry-responses', [EnquiryResponseController::class, 'store']);
 use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceForCarTypeController;
+use App\Http\Controllers\RequestServiceController;
 use App\Models\User;
 
 Route::apiResource('car-types', CarTypeController::class);
@@ -58,5 +59,14 @@ Route::get('customer-cars', [CustomerCarController::class, 'index']);
 //Route::post('service-create',[ServiceController::class,'store']);
  Route::apiResource('services', ServiceController::class);
  Route::apiResource('service-price',ServiceForCarTypeController::class);
-});
+ route::post('request-services',[RequestServiceController::class,'store']);
+ route::post('request-estimate',[RequestServiceController::class,'estimateCost']);
+ Route::get('requests',[RequestServiceController::class,'index']);
+ route::get('request/{id}',[RequestServiceController::class,'show']);
+ Route::put('request/{id}',[RequestServiceController::class,'updateStatus']);
+ Route::post('requests/{id}/accept',[RequestServiceController::class,'accept']);
+ Route::get('requests/incoming',[RequestServiceController::class,'incomingRequests']);
+ Route::get('requests/completed',[RequestServiceController::class,'completedRequests']);
+ Route::get('requests/filter',[RequestServiceController::class,'filterRequests']);
 
+});

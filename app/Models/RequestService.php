@@ -4,8 +4,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Request extends Model
+class RequestService extends Model
 {
+    protected $table = 'requests';
     protected $fillable = [
         'customer_car_id',
         'provider_id',
