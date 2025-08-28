@@ -26,7 +26,7 @@ class CustomerCar extends Model
 
     public function requests()
     {
-        return $this->hasMany(Request::class);
+        return $this->hasMany(RequestService::class);
     }
 
 }

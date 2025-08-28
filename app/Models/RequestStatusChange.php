@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestStatusChange extends Model
 {
+    public $timestamps = true;   
+        const UPDATED_AT = null;     // disable updated_at
     protected $fillable = [
         'request_id',
         'status'
@@ -15,7 +17,7 @@ class RequestStatusChange extends Model
 
     public function request()
     {
-        return $this->belongsTo(Request::class);
+        return $this->belongsTo(RequestService::class, 'request_id');
     }
 
 }

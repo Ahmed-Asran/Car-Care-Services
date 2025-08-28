@@ -39,7 +39,7 @@ class RequestService extends Model
 
     public function statusChanges()
     {
-        return $this->hasMany(RequestStatusChange::class);
+        return $this->hasMany(RequestStatusChange::class,'request_id');
     }
 
     public function notifications()
@@ -50,5 +50,23 @@ class RequestService extends Model
     public function review()
     {
         return $this->hasOne(Review::class);
+    }
+    protected static function boot()
+    {
+         parent::boot();
+        static::created(function ($requestService) {
+            // Create an initial status change record when a new request is created
+            $requestService->statusChanges()->create([
+                'status' => $requestService->status,
+            ]);
+        });
+        static::updated(function ($requestService) {
+            // Update the status change record when the status is updated
+           if($requestService->isDirty('status')) {
+               $requestService->statusChanges()->create([
+                   'status' => $requestService->status,
+               ]);
+           }
+        });
     }
 }

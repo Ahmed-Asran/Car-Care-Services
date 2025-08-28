@@ -22,6 +22,7 @@ use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceForCarTypeController;
 use App\Http\Controllers\RequestServiceController;
+use App\Http\Controllers\RequestStatusChangeController;
 use App\Models\User;
 
 Route::apiResource('car-types', CarTypeController::class);
@@ -69,4 +70,6 @@ Route::get('customer-cars', [CustomerCarController::class, 'index']);
  Route::get('requests/completed',[RequestServiceController::class,'completedRequests']);
  Route::get('requests/filter',[RequestServiceController::class,'filterRequests']);
 
+Route::get('request-statuses', [RequestStatusChangeController::class, 'index']); // list all statuses (admin or customer)
+Route::get('request-statuses/{id}', [RequestStatusChangeController::class, 'show']); // show history for a single request
 });
