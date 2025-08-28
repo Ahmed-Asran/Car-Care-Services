@@ -19,7 +19,7 @@ class Provider extends Model
 
     public function requests()
     {
-        return $this->hasMany(Request::class);
+        return $this->hasMany(Requestservice::class);
     }
 
     

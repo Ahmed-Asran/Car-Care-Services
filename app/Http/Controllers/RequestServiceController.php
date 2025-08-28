@@ -184,20 +184,47 @@ class RequestServiceController extends Controller
     public function incomingRequests()
     {
         $this->authorize('viewIncoming', RequestService::class);
-
-        $provider = Auth::user()->provider;
+        $provider = Auth::user()->provider;   // returns Provider model or null
+        if ($provider) {
+            $provider->load('location');     // eager load location
+        }
         if (!$provider) {
             return response()->json(['message' => 'Provider profile not found'], 404);
         }
-
+        $validated = request()->validate([
+            'radius' => 'numeric|between:0,100',
+        ]);
+        $radius = $validated['radius'] ?? 20; // default 20km radius
         // For simplicity, fetching all pending requests without location filtering
-
-        $requests = RequestService::with(['customerCar.customer', 'service'])
-            ->where('provider_id', null)
-            ->where('status', 'pending')
-            ->get()->values();
-
-        return response()->json($requests);
+        $providerLat = $provider->location ? $provider->location->latitude : null;
+        $providerLng = $provider->location ? $provider->location->longitude : null;
+        if (!$providerLat || !$providerLng) {
+        if (!$provider->location) {
+            return response()->json([
+                'message' => 'Provider location not set. Please set your registered location first.',
+            ], 400);
+            }
+        }
+           $requests = RequestService::with(['customerCar.customer', 'service'])
+        ->whereNull('provider_id')
+        ->where('status', 'pending')
+        ->get()
+        ->map(function ($serviceRequest) use ($providerLat, $providerLng) {
+            $distance = $this->calculateDistance(
+                $providerLat,
+                $providerLng,
+                $serviceRequest->location_latitude,
+                $serviceRequest->location_longitude
+            );
+            $serviceRequest->distance_from_provider = $distance;
+            return $serviceRequest;
+        })
+        ->filter(function ($serviceRequest) use ($radius) {
+            return $serviceRequest->distance_from_provider <= $radius;
+        })
+        ->sortBy('distance_from_provider')   // <-- sort by distance (closest first)
+        ->values();
+        return response()->json($requests->values());
     }
     public function completedRequests()
     {
@@ -240,5 +267,19 @@ class RequestServiceController extends Controller
 
     return response()->json($requests);
 }
+/**
+ * Calculate distance between two points using Haversine formula
+ */
+private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+{
+    $earthRadius = 6371; // Earth's radius in kilometers
 
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLon = deg2rad($lon2 - $lon1);
+
+    $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
+    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+
+    return $earthRadius * $c;
+}
 }
