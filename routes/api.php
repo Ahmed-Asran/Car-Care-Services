@@ -23,6 +23,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceForCarTypeController;
 use App\Http\Controllers\RequestServiceController;
 use App\Http\Controllers\RequestStatusChangeController;
+use App\Http\Controllers\SettingController;
 use App\Models\User;
 
 Route::apiResource('car-types', CarTypeController::class);
@@ -31,7 +32,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 //-----------------------public routes--------------
-//registration 
+//registration
 Route::post('register',[AuthController::class,'register']);
 //login
 Route::post('login',[AuthController::class,'login']);
@@ -73,3 +74,14 @@ Route::get('customer-cars', [CustomerCarController::class, 'index']);
 Route::get('request-statuses', [RequestStatusChangeController::class, 'index']); // list all statuses (admin or customer)
 Route::get('request-statuses/{id}', [RequestStatusChangeController::class, 'show']); // show history for a single request
 });
+
+    // ==============================Setting/////   /////////////////////
+Route::get('/setting',SettingController::class.'@index');
+Route::get('/setting/{id}',SettingController::class.'@show');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/setting', [SettingController::class, 'store']);
+    Route::put('/setting/{setting}', [SettingController::class, 'update']);
+    Route::delete('/setting/{setting}', [SettingController::class, 'destroy']);
+});
+

@@ -20,6 +20,8 @@ class AuthController extends Controller
             'email'      => 'required|string|email|unique:users',
             'phone'      => 'required|string|max:20|unique:users',
             'password'   => 'required|string|confirmed|min:6',
+            'role'       => 'required|string|in:customer,admin,provider', // <-- اضيف هذا
+
         ]);
         $user=User::create([
             'first_name' => $fields['first_name'],
@@ -27,22 +29,25 @@ class AuthController extends Controller
             'email'      => $fields['email'],
             'phone'      => $fields['phone'],
             'password'   => Hash::make($fields['password']),
-            'salt'        => bin2hex(random_bytes(16))
+            'salt'        => bin2hex(random_bytes(16)),
+             'role'       => $fields['role'] ?? 'user', // الافتراضي 'user' لو مش محدد
+
         ]);
-        $token=$user->createToken($user->last_name);
-        $response=Response(["user"=>$user,"token"=>$token],201);
+        $token=$user->createToken($user->last_name)->plainTextToken;
+        $response=Response(["user"=>$user,"token"=>$token, 'token_type' => 'Bearer'],201);
         return Response()->json($response,201);
+
     }
     public function registerProvider(Request $request){
-        // check the user is exist first 
+        // check the user is exist first
         $user=$request->user();
         if(!$user)
         {
         return Response()->json(['error' => 'User not authenticated'],401);
         }
 
-        $fields=$request->validate([   
-        // provider details, image  execluded 
+        $fields=$request->validate([
+        // provider details, image  execluded
         'street'    => 'nullable|string|max:255',
         'city'      => 'required|string|max:100',
         'state'     => 'required|string|max:100',
@@ -51,8 +56,8 @@ class AuthController extends Controller
         'longitude' => 'nullable|numeric|between:-180,180',
         'national_id_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
-           
-            
+
+
         DB::beginTransaction(); //begin the creation of all field in the entities
         try {
             if ($user->role !== 'provider') {
@@ -64,7 +69,7 @@ class AuthController extends Controller
             {
             $file=$request->file('national_id_image');
             $path=$file->store('images', 'public');
-            
+
             $image = \App\Models\Image::create([
             'name' => $file->getClientOriginalName(),
             'mime' => $file->getClientMimeType(),
@@ -127,6 +132,6 @@ class AuthController extends Controller
        return response()->json([
             'message' => 'Logged out successfully',
         ]);
-    } 
+    }
 
 }

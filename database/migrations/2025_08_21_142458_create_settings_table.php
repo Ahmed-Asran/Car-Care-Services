@@ -23,8 +23,7 @@ return new class extends Migration
             $table->string('whatsapp_number', 20)->nullable();
             $table->string('primary_phone_number', 20)->nullable();
             $table->string('secondary_phone_number', 20)->nullable();
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();
+            $table->timestamps();
         });
     }
 
