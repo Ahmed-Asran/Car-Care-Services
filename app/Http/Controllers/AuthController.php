@@ -45,15 +45,19 @@ class AuthController extends Controller
         {
         return Response()->json(['error' => 'User not authenticated'],401);
         }
+        //check if the user is already a provider
+        if($user->role==='provider'){
+            return Response()->json(['message' => 'User is already a provider'],400);
+        }
 
         $fields=$request->validate([
         // provider details, image  execluded
         'street'    => 'nullable|string|max:255',
-        'city'      => 'required|string|max:100',
-        'state'     => 'required|string|max:100',
-        'country'   => 'required|string|max:100',
-        'latitude'  => 'nullable|numeric|between:-90,90',
-        'longitude' => 'nullable|numeric|between:-180,180',
+        'city'      => 'nullable|string|max:100',
+        'state'     => 'nullable|string|max:100',
+        'country'   => 'nullable|string|max:100',
+        'latitude'  => 'required|numeric|between:-90,90',
+        'longitude' => 'required|numeric|between:-180,180',
         'national_id_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
