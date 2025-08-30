@@ -45,18 +45,10 @@ class RequestServiceController extends Controller
         if (!$servicePrice) {
             return response()->json(['message' => 'Service not available for this car type'], 400);
         }
-
-        // Calculate distance ( should implement actual distance calculation)
-        $distance =5;
-
-        $distancePrice = $distance * 10; // 10 per km
-        $totalPrice = $servicePrice + $distancePrice;
-
         return response()->json([
-            'service_price' => $servicePrice,
-            'distance' => $distance,
-            'distance_price' => $distancePrice,
-            'total_price' => $totalPrice,
+            "message"=>'this is cost for this service for your car and its will incearse with distance.',
+            'base_service_price' => $servicePrice,
+            
         ]);
     }
     /**
@@ -89,21 +81,14 @@ class RequestServiceController extends Controller
             return response()->json(['message' => 'Service not available for this car type'], 400);
         }
 
-        // Calculate distance ( should implement actual distance calculation)
-        $distance =5;
-
-        $distancePrice = $distance * 10; // 10 per km
-        $totalPrice = $servicePrice + $distancePrice;
+        
         $serviceRequest = RequestService::create([
             'customer_car_id' => $validated['customer_car_id'],
             'provider_id' => $validated['provider_id'] ?? null,
             'service_id' => $validated['service_id'],
             'location_latitude' => $validated['location_latitude'],
             'location_longitude' => $validated['location_longitude'],
-            'distance' => $distance,
             'service_price' => $servicePrice,
-            'distance_price' => $distancePrice,
-            'total_price' => $totalPrice,
             'status' => 'pending',
         ]);
 
@@ -155,28 +140,51 @@ class RequestServiceController extends Controller
         //
     }
     public function accept($id)
-    {
-        $serviceRequest = Requestservice::findOrFail($id);
-        $this->authorize('accept', $serviceRequest);
+{
+    $serviceRequest = RequestService::findOrFail($id);
 
-        if ($serviceRequest->provider_id !== null) {
-            return response()->json(['message' => 'Request already assigned'], 400);
-        }
-
-        if ($serviceRequest->status !== 'pending') {
-            return response()->json(['message' => 'Request cannot be accepted'], 400);
-        }
-
-        $serviceRequest->update([
-            'provider_id' => Auth::user()->provider->id,
-            'status' => 'accepted'
-        ]);
-
-        return response()->json([
-            'message' => 'Request accepted successfully',
-            'data' => $serviceRequest->load(['customerCar.customer', 'service'])
-        ]);
+    // Check if already accepted
+    if ($serviceRequest->provider_id !== null) {
+        return response()->json(['message' => 'Request already assigned'], 400);
     }
+
+    // Get authenticated provider (assuming provider is logged in)
+    $provider = auth()->user()->provider; // adjust if provider is linked differently
+    if (!$provider || !$provider->location) {
+        return response()->json(['message' => 'Provider location not set'], 400);
+    }
+
+    // Assign provider to the request
+    $serviceRequest->provider_id = $provider->id;
+    $serviceRequest->status = 'accepted';
+
+    // Calculate distance
+    $distance = $this->calculateDistance(
+        $provider->location->latitude,
+        $provider->location->longitude,
+        $serviceRequest->location_latitude,
+        $serviceRequest->location_longitude
+    );
+
+    // Distance-based price
+    $distancePrice = $distance * 5; // e.g. 5 per km
+    $totalPrice = $serviceRequest->service_price + $distancePrice;
+
+    // Save new price
+    $serviceRequest->total_price = $totalPrice; 
+    $serviceRequest->distance = $distance;
+    $serviceRequest->distance_price = $distancePrice;
+    $serviceRequest->save();
+
+    return response()->json([
+        'message' => 'Request accepted successfully',
+        'distance' => $distance,
+        'distance_price' => $distancePrice,
+        'total_price' => $totalPrice,
+        'request' => $serviceRequest
+    ]);
+}
+
     /**
      * Get incoming nearby requests for providers
      * Provider only
